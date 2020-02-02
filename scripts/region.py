@@ -28,12 +28,12 @@ if __name__ == '__main__':
     provinces = ['Zhejiang', 'Guangdong', 'Henan', 'Hunan', 'Anhui']
 
     for province in provinces:
-        province_df = cases_df[cases_df.province == province]
+        province_df = cases_df[cases_df.province == province].copy()
         # print(province_df.city.value_counts(dropna=False).head())
 
         city_incidence = daily_cases_by_city(province_df)
         # print(city_incidence)
 
-        plot_case_histograms(city_incidence)
+        plot_case_histograms(city_incidence, suptitle=province)
 
     plt.show()

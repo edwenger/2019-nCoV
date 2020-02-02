@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from parse import parse_china, parse_china_wo_hubei, daily_cases_by_admin1
 
 
-def plot_case_histograms(df, top_n_provinces=6):
+def plot_case_histograms(df, top_n_provinces=6, suptitle=''):
 
     df.columns = [dt.strftime('%b-%d') for dt in df.columns]
 
@@ -14,7 +14,11 @@ def plot_case_histograms(df, top_n_provinces=6):
         ax.legend(loc=2)
         ax.set(title='')
 
-    plt.gcf().set_tight_layout(True)
+    fig = plt.gcf()
+
+    fig.suptitle(suptitle, y=1)
+
+    fig.set_tight_layout(True)
 
 
 if __name__ == '__main__':
@@ -23,6 +27,6 @@ if __name__ == '__main__':
     # cases_df = parse_china_wo_hubei()
     province_incidence = daily_cases_by_admin1(cases_df)
 
-    plot_case_histograms(province_incidence, top_n_provinces=10)
+    plot_case_histograms(province_incidence, top_n_provinces=6, suptitle='China')
 
     plt.show()
