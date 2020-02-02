@@ -1,6 +1,7 @@
 """ Parse the line list data and do some cleaning and joining with administrative shapes """
 
 import os
+import json
 
 import pandas as pd
 import geopandas
@@ -10,8 +11,9 @@ def parse_hubei():
     return parse_sheet(sheetname='Hubei')
 
 
-def parse_outside_hubei():
-    return parse_sheet(sheetname='outside_Hubei')
+def parse_china_wo_hubei():
+    df = parse_sheet(sheetname='outside_Hubei')
+    return df[df.country == 'China']
 
 
 def parse_sheet(sheetname):
@@ -46,19 +48,39 @@ def sum_cases(df):
 
 def daily_cases_by_admin1(df, sort_by_totals=True):
 
+    df['province'] = df.province.str.strip()  # avoid duplication from whitespace
+
     daily_cases = df.groupby(['province', 'date_confirmation']).country.count().unstack().fillna(0)
 
     if sort_by_totals:
         total_cases = sum_cases(daily_cases)
         daily_cases = daily_cases.ix[total_cases.index]
 
-    return daily_cases
+        daily_cases = daily_cases.reindex(sorted(daily_cases.columns), axis=1)
+
+    return daily_cases.astype(int)
+
+
+def format_json(df):
+
+    all_case_data = {idx: row.tolist() for idx, row in df.iterrows()}
+    all_case_data['Cumulative'] = sum_cases(df).to_dict()
+    all_case_data['Recent'] = df.iloc[:, -7:].sum(axis=1).to_dict()  # last week
+
+    output = {'CHN': all_case_data}
+
+    tmp_path = os.path.join('..', 'data', 'tmp')
+    os.makedirs(tmp_path, exist_ok=True)
+
+    with open(os.path.join(tmp_path, 'tmp.json'), 'w') as fp:
+        json.dump(output, fp)
 
 
 if __name__ == '__main__':
-    outside_hubei_df = parse_outside_hubei()
+    outside_hubei_df = parse_china_wo_hubei()
     print(outside_hubei_df.province.value_counts(dropna=False).head())
 
     province_incidence = daily_cases_by_admin1(outside_hubei_df)
     print(province_incidence)
 
+    format_json(province_incidence)  # dumps tmp.json to be copied into all_case_data.js
