@@ -16,6 +16,17 @@ def parse_china_wo_hubei():
     return df[df.country == 'China']
 
 
+def parse_international():
+    df = parse_sheet(sheetname='outside_Hubei')
+    return df[df.country != 'China']
+
+
+def parse_china():
+    h = parse_hubei()
+    c = parse_china_wo_hubei()
+    return pd.concat([h, c], ignore_index=True, sort=False)
+
+
 def parse_sheet(sheetname):
 
     linelist_path = os.path.join('..', 'data', 'cases', 'nCoV2019_2020_line_list_open.xlsx')
@@ -24,7 +35,10 @@ def parse_sheet(sheetname):
         linelist_path,
         sheet_name=sheetname,
         index_col='ID',
+        na_values=['not sure'],  # NaT for confirmation date
         parse_dates=['date_confirmation'])
+
+    df['date_confirmation'] = pd.to_datetime(df.date_confirmation)
 
     return df
 

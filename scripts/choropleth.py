@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from parse import parse_outside_hubei, daily_cases_by_admin1, parse_shapes, sum_cases
+from parse import parse_china, parse_china_wo_hubei, daily_cases_by_admin1, parse_shapes, sum_cases
 
 
 def plot_case_map(df, shapes):
@@ -15,8 +15,10 @@ def plot_case_map(df, shapes):
 
 if __name__ == '__main__':
 
-    outside_hubei_df = parse_outside_hubei()
-    province_incidence = daily_cases_by_admin1(outside_hubei_df)
+    cases_df = parse_china()
+    # cases_df = parse_china_wo_hubei()
+    province_incidence = daily_cases_by_admin1(cases_df)
+    print(province_incidence)
 
     total_incidence = sum_cases(province_incidence)
     admin1_shapes = parse_shapes(level=1)
