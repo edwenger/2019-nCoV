@@ -5,7 +5,7 @@ from parse import parse_china, parse_china_wo_hubei, daily_cases_by_admin1
 
 def plot_case_histograms(df, top_n_provinces=6, suptitle=''):
 
-    df.columns = [dt.strftime('%b-%d') for dt in df.columns]
+    df.columns = [dt.strftime('%m/%d') for dt in df.columns]
 
     axes = df.T.iloc[:, :top_n_provinces].sort_index().plot.bar(
         rot=90, subplots=True, sharey=True, figsize=(6, 8))

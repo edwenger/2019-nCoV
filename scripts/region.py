@@ -25,24 +25,32 @@ def lat_lon_by_city(df):
 
     df['city'] = df.city.str.strip()  # avoid duplication from whitespace
 
-    return df.groupby('city')[['latitude', 'longitude', 'geo_resolution']].first()
+    locations_df = df.groupby('city')[['latitude', 'longitude', 'geo_resolution']].first()
+
+    for c in ['latitude', 'longitude']:
+        locations_df[c] = locations_df[c].astype(float)  # somehow these were strings?
+
+    return locations_df
 
 
 def plot_city_incidence(df, locations, shapes, title=''):
 
-    shapes.plot(color='none', edgecolor='darkgray', linewidth=0.5)
+    fig, ax = plt.subplots(1, 1)
+
+    shapes.plot(color='none', edgecolor='darkgray', linewidth=0.5, ax=ax)
 
     city_totals = sum_cases(df)
-    city_recent = df.iloc[:, -3:].sum(axis=1).rename('recent')  # last 3 days
+    city_recent = df.iloc[:, -7:].sum(axis=1).rename('recent')  # last 7 days
     locations = locations.join(city_totals).join(city_recent)
-    plt.scatter(locations.longitude, locations.latitude,
-                s=locations.total, c='goldenrod')
-    plt.scatter(locations.longitude, locations.latitude,
-                s=locations.recent, c='yellow')
-    ax = plt.gca()
+    print(locations)
+
+    ax.scatter(x=locations.longitude, y=locations.latitude,
+               s=locations.total, c='goldenrod')
+    ax.scatter(x=locations.longitude, y=locations.latitude,
+               s=locations.recent, c='yellow')
     ax.axis('off')
     ax.set(aspect='equal', title=title)
-    plt.gcf().set_tight_layout(True)
+    fig.set_tight_layout(True)
 
 
 if __name__ == '__main__':
@@ -51,7 +59,8 @@ if __name__ == '__main__':
     # cases_df = parse_china_wo_hubei()
     print(cases_df.province.value_counts(dropna=False).head())
 
-    provinces = ['Zhejiang', 'Guangdong', 'Henan', 'Hunan', 'Anhui']
+    # provinces = ['Zhejiang', 'Guangdong', 'Henan', 'Hunan', 'Anhui']
+    provinces = ['Henan']
 
     admin2_shapes = parse_shapes(level=2)
 
@@ -71,7 +80,7 @@ if __name__ == '__main__':
 
         plot_city_incidence(city_incidence, city_locations, districts, title=province)
 
-        # plot_case_histograms(city_incidence, suptitle=province)
+        plot_case_histograms(city_incidence, suptitle=province)
 
         break
 

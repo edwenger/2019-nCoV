@@ -86,16 +86,16 @@ var Histogram = function (sets) {
 
 	// convert 52 week numeric scale to months for x-axis labeling
 	allScales['timeScale'] = d3.time.scale()
-		.domain([new Date(2020, 0, 19), new Date(2020, 1, 0)])
+		.domain([new Date(2020, 0, 19), new Date(2020, 1, 20)])
 		.range([0, self.width - self.padding['xAxis'] - self.padding['rightEdge']])
 
 	//get x-and y-axis set up
 	allScales['xAxisFunction'] = d3.svg.axis()
 		.scale(allScales['timeScale'])
 		.orient("bottom")
-		.ticks(d3.time.days)
-		.tickSize(6, 0)
-		.tickFormat(d3.time.format("%d"));
+		.ticks(d3.time.weeks)
+		.tickSize(10, 0)
+		.tickFormat(d3.time.format("%b-%d"));
 
 	allScales['yAxisFunction'] = d3.svg.axis()
 		.scale(allScales['yAxisScale'])

@@ -8,16 +8,19 @@ import geopandas
 
 
 def parse_hubei():
-    return parse_sheet(sheetname='Hubei')
+    return parse_linelist('ncov_hubei.csv')
+    # return parse_sheet(sheetname='Hubei')
 
 
 def parse_china_wo_hubei():
-    df = parse_sheet(sheetname='outside_Hubei')
+    df = parse_linelist('ncov_outside_hubei.csv')
+    # df = parse_sheet(sheetname='outside_Hubei')
     return df[df.country == 'China']
 
 
 def parse_international():
-    df = parse_sheet(sheetname='outside_Hubei')
+    df = parse_linelist('ncov_outside_hubei.csv')
+    # df = parse_sheet(sheetname='outside_Hubei')
     return df[df.country != 'China']
 
 
@@ -25,6 +28,21 @@ def parse_china():
     h = parse_hubei()
     c = parse_china_wo_hubei()
     return pd.concat([h, c], ignore_index=True, sort=False)
+
+
+def parse_linelist(filename):
+
+    linelist_path = os.path.join('..', 'data', 'cases', filename)
+
+    df = pd.read_csv(
+        linelist_path,
+        encoding='cp1252',  # Excel-to-CSV conversion leaves invalid bytes for default utf-8 ??
+        index_col='ID',
+        na_values=['not sure'])  # NaT for confirmation date
+
+    df['date_confirmation'] = pd.to_datetime(df.date_confirmation, format='%d.%m.%Y')
+
+    return df
 
 
 def parse_sheet(sheetname):
