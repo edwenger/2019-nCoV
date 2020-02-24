@@ -33,7 +33,7 @@ def lat_lon_by_city(df):
     return locations_df
 
 
-def plot_city_incidence(df, locations, shapes, title=''):
+def map_city_incidence(df, locations, shapes, title=''):
 
     fig, ax = plt.subplots(1, 1)
 
@@ -78,7 +78,7 @@ if __name__ == '__main__':
         # print(districts.NAME_2.head(10))
         # print(districts.iloc[0])
 
-        plot_city_incidence(city_incidence, city_locations, districts, title=province)
+        map_city_incidence(city_incidence, city_locations, districts, title=province)
 
         plot_case_histograms(city_incidence, suptitle=province)
 
